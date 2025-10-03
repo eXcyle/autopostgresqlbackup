@@ -20,7 +20,7 @@ RUN apk add --no-cache \
 RUN git clone https://github.com/k0lter/autopostgresqlbackup.git /opt/autopostgresqlbackup
 
 # Make script executable
-RUN chmod +x /opt/autopostgresqlbackup/autopostgresqlbackup.sh
+RUN chmod +x /opt/autopostgresqlbackup/autopostgresqlbackup
 
 # Copy and set Docker entrypoint
 COPY docker-entrypoint.sh /docker-entrypoint.sh
