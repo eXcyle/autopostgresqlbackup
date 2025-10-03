@@ -13,7 +13,9 @@ RUN apk add --no-cache \
     openssl \
     tzdata \
     shadow \
-    cronie
+    cronie \
+    inetutils \
+    findutils
 
 # Clone the backup script
 RUN git clone https://github.com/k0lter/autopostgresqlbackup.git /opt/autopostgresqlbackup
