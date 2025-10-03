@@ -9,14 +9,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gnupg \
     ca-certificates
 
-RUN echo "deb http://apt.postgresql.org/pub/repos/apt bullseye-pgdg main" > /etc/apt/sources.list.d/pgdg.list
-RUN curl -sSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
+# Add PostgreSQL signing key to a scoped keyring
+RUN curl -sSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+    | gpg --dearmor -o /usr/share/keyrings/postgresql.gpg
+
+# Add the PostgreSQL repo using signed-by
+RUN echo "deb [signed-by=/usr/share/keyrings/postgresql.gpg] http://apt.postgresql.org/pub/repos/apt bullseye-pgdg main" \
+    > /etc/apt/sources.list.d/pgdg.list
 
 # Install dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     bash \
-    curl \
     gzip \
     openssl \
     tzdata \
@@ -24,15 +28,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     cron \
     postgresql-client-17
 
+RUN apt-get purge -y curl gnupg ca-certificates
+RUN rm -rf /usr/share/keyrings/postgresql.gpg
+RUN rm -rf /etc/apt/sources.list.d/pgdg.list
 RUN rm -rf /var/lib/apt/lists/*
 
 # Clone the backup script
 RUN git clone https://github.com/k0lter/autopostgresqlbackup.git /opt/autopostgresqlbackup
-RUN rm /opt/autopostgresqlbackup/.git -rf
-RUN rm /opt/autopostgresqlbackup/examples -rf
-RUN rm /opt/autopostgresqlbackup/services -rf
-RUN rm /opt/autopostgresqlbackup/*.md -rf
-RUN rm /opt/autopostgresqlbackup/Makefile -rf
+RUN rm -rf /opt/autopostgresqlbackup/.git
+RUN rm -rf /opt/autopostgresqlbackup/examples
+RUN rm -rf /opt/autopostgresqlbackup/services
+RUN rm -rf /opt/autopostgresqlbackup/*.md
+RUN rm -rf /opt/autopostgresqlbackup/Makefile
 
 # Make script executable
 RUN chmod +x /opt/autopostgresqlbackup/autopostgresqlbackup
