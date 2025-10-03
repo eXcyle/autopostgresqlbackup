@@ -28,10 +28,10 @@ fi
 #  If CRON_SCHEDULE is defined, use this value, otherwise use a default
 if [ "${PG_CRON_SCHEDULE}" ]; then
     CRON_SCHEDULE="40 4 * * *"
-    echo "Configuring schedule in /etc/crontab for ${CRON_SCHEDULE} ..."
+    echo "Configuring schedule in /etc/crontab for ${CRON_SCHEDULE}..."
 else
     CRON_SCHEDULE="0 2 * * *"
-    echo "Configuring schedule in /etc/crontab for dafault crontab running daily at 02:00 ..."
+    echo "Configuring schedule in /etc/crontab for dafault crontab running daily at 02:00..."
 fi
   
 # Create the crontab file
@@ -45,7 +45,7 @@ ${CRON_SCHEDULE} root /opt/autopostgresqlbackup/autopostgresqlbackup
 EOF
 
 # Create the postgresql password file
-echo "Creating the password file..."
+echo "Creating postgresql password file..."
 cat <<-EOF > /root/.pgpass
 
 ${PG_DBHOST:-localhost}:*:*:${PG_USERNAME:-postgres}:${PASSPHRASE}
@@ -122,11 +122,17 @@ env | grep '^PG_' | while IFS='=' read -r raw_key value; do
 done
 
 echo "Config written to $CONFIG_PATH"
+echo "Current Config :"
+cat $CONFIG_PATH
+
+echo ""
+echo "Done setting up..."
 
 # set /etc/environment for cron
 printenv > /etc/environment
 
 # Execute cron with parameters (autopostgresql script is under /etc/cron.daily)
+echo ""
 echo "Execute cron service..."
 exec crond -f
 
