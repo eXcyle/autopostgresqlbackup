@@ -59,14 +59,32 @@ fi
 
 # Generate configfile by using PG_ docker variables
 CONFIG_PATH="/etc/autodbbackup.d/autopostgresqlbackup.conf"
+BLACKLIST=("MAILADDR" "DBENGINE" "SU_USERNAME" "BACKUPDIR" "PGDUMP" "PGDUMPALL" "PGDUMP_OPTS" "PGDUMPALL_OPTS" "MY" "MYDUMP" "MYDUMP_OPTS" "PREBACKUP" "POSTBACKUP")
+
 > "$CONFIG_PATH"
+echo "MAILADDR=\"\""
+echo "DBENGINE=\"postgresql\""
+echo "SU_USERNAME=\"\""
+echo "BACKUPDIR=\"/backup\""
 
 # Loop through all PG_* environment variables
-env | grep '^PG_' | while IFS='=' read -r key value; do
+env -o | grep '^PG_' | while IFS='=' read -r key value; do
     stripped_key="${key#PG_}"
-    echo "${stripped_key}=${value}" >> "$CONFIG_PATH"
-done
 
+    # Check if stripped key is in blacklist
+    skip=false
+    for blocked in "${BLACKLIST[@]}"; do
+        if [[ "${stripped_key,,}" == "${blocked,,}" ]]; then
+            skip=true
+            break
+        fi
+    done
+
+    # Write to config if not blacklisted
+    if ! $skip; then
+        echo "${stripped_key}=\"${value}\"" >> "$CONFIG_PATH"
+    fi
+done
 echo "Config written to $CONFIG_PATH"
 
 # set /etc/environment for cron
