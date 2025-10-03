@@ -34,4 +34,4 @@ COPY autopostgresqlbackup.conf /etc/default/autopostgresqlbackup
 RUN mkdir -p $BACKUPDIR
 
 # Add cron job
-RUN echo "0 2 * * * /opt/autopostgresqlbackup/autopostgresqlbackup.sh > /var/log/pgbackup.log 2>&1" >> /etc/crontabs/root
+RUN echo "0 2 * * * /opt/autopostgresqlbackup/autopostgresqlbackup" >> /etc/crontabs/root
