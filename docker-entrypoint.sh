@@ -62,4 +62,5 @@ printenv > /etc/environment
 
 # Execute cron with parameters (autopostgresql script is under /etc/cron.daily)
 echo "Execute cron service..."
-exec cron -f -l ${PG_CRON_LOG_LEVEL:-8}
+exec crond -f -l ${PG_CRON_LOG_LEVEL:-8} -L /var/log/cron.log
+
