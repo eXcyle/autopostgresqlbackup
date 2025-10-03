@@ -28,7 +28,7 @@ RUN chmod +x /docker-entrypoint.sh
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
 # Copy default config
-COPY autopostgresqlbackup /etc/default/autopostgresqlbackup
+COPY autopostgresqlbackup.conf /etc/default/autopostgresqlbackup
 
 # Create backup directory
 RUN mkdir -p $BACKUPDIR
