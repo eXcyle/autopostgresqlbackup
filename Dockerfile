@@ -28,18 +28,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     cron \
     postgresql-client-17
 
-RUN apt-get purge -y curl gnupg ca-certificates
-RUN rm -rf /usr/share/keyrings/postgresql.gpg
-RUN rm -rf /etc/apt/sources.list.d/pgdg.list
-RUN rm -rf /var/lib/apt/lists/*
-
 # Clone the backup script
 RUN git clone https://github.com/k0lter/autopostgresqlbackup.git /opt/autopostgresqlbackup
-RUN rm -rf /opt/autopostgresqlbackup/.git
-RUN rm -rf /opt/autopostgresqlbackup/examples
-RUN rm -rf /opt/autopostgresqlbackup/services
-RUN rm -rf /opt/autopostgresqlbackup/*.md
-RUN rm -rf /opt/autopostgresqlbackup/Makefile
 
 # Make script executable
 RUN chmod +x /opt/autopostgresqlbackup/autopostgresqlbackup
@@ -54,3 +44,16 @@ RUN mkdir -p /etc/autodbbackup.d/
 
 # Create backup directory
 RUN mkdir -p "/backup"
+
+# Cleanup image
+RUN rm -rf /opt/autopostgresqlbackup/.git
+RUN rm -rf /opt/autopostgresqlbackup/examples
+RUN rm -rf /opt/autopostgresqlbackup/services
+RUN rm -rf /opt/autopostgresqlbackup/*.md
+RUN rm -rf /opt/autopostgresqlbackup/Makefile
+
+RUN apt-get purge -y curl gnupg ca-certificates
+
+RUN rm -rf /usr/share/keyrings/postgresql.gpg
+RUN rm -rf /etc/apt/sources.list.d/pgdg.list
+RUN rm -rf /var/lib/apt/lists/*
