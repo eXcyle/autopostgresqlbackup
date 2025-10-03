@@ -124,14 +124,14 @@ echo "Config written to $CONFIG_PATH"
 echo "Current Config :"
 cat $CONFIG_PATH
 
-echo ""
+echo " "
 echo "Done setting up..."
 
 # set /etc/environment for cron
 printenv > /etc/environment
 
 # Execute cron with parameters (autopostgresql script is under /etc/cron.daily)
-echo ""
+echo " "
 echo "Execute cron service..."
 exec crond -f
 
