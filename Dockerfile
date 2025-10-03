@@ -18,7 +18,7 @@ RUN echo "deb http://apt.postgresql.org/pub/repos/apt bullseye-pgdg main" > /etc
 RUN curl -sSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    postgresql-client-17 \
+    postgresql-client-17
 
 RUN rm -rf /var/lib/apt/lists/*
 
