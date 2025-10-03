@@ -32,6 +32,3 @@ RUN mkdir -p /etc/autodbbackup.d/
 
 # Create backup directory
 RUN mkdir -p $BACKUPDIR
-
-# Add cron job
-RUN echo "0 2 * * * /opt/autopostgresqlbackup/autopostgresqlbackup" >> /etc/crontabs/root
