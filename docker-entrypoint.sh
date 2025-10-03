@@ -26,8 +26,7 @@ fi
 
 # Logic for the CRON schedule
 #  If CRON_SCHEDULE is defined, use this value, otherwise use a default
-if [ "${PG_CRON_SCHEDULE}" ]; then
-    CRON_SCHEDULE="40 4 * * *"
+if [ "${CRON_SCHEDULE}" ]; then
     echo "Configuring schedule in /etc/crontab for ${CRON_SCHEDULE}..."
 else
     CRON_SCHEDULE="0 2 * * *"
