@@ -133,5 +133,5 @@ printenv > /etc/environment
 # Execute cron with parameters (autopostgresql script is under /etc/cron.daily)
 echo " "
 echo "Execute cron service..."
-exec crond -f
+exec cron -f
 
