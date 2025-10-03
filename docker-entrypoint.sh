@@ -68,7 +68,7 @@ echo "SU_USERNAME=\"\""
 echo "BACKUPDIR=\"/backup\""
 
 # Loop through all PG_* environment variables
-env -o | grep '^PG_' | while IFS='=' read -r key value; do
+env -0 | grep '^PG_' | while IFS='=' read -r key value; do
     stripped_key="${key#PG_}"
     upper_key="${stripped_key^^}"
 
