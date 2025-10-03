@@ -62,10 +62,10 @@ CONFIG_PATH="/etc/autodbbackup.d/autopostgresqlbackup.conf"
 BLACKLIST=("MAILADDR" "DBENGINE" "SU_USERNAME" "BACKUPDIR" "PGDUMP" "PGDUMPALL" "PGDUMP_OPTS" "PGDUMPALL_OPTS" "MY" "MYDUMP" "MYDUMP_OPTS" "PREBACKUP" "POSTBACKUP")
 
 > "$CONFIG_PATH"
-echo "MAILADDR=\"\""
-echo "DBENGINE=\"postgresql\""
-echo "SU_USERNAME=\"\""
-echo "BACKUPDIR=\"/backup\""
+echo "MAILADDR=\"\"" >> "$CONFIG_PATH"
+echo "DBENGINE=\"postgresql\"" >> "$CONFIG_PATH"
+echo "SU_USERNAME=\"\"" >> "$CONFIG_PATH"
+echo "BACKUPDIR=\"/backup\"" >> "$CONFIG_PATH"
 
 # Loop through all PG_* environment variables
 env -0 | grep '^PG_' | while IFS='=' read -r key value; do
