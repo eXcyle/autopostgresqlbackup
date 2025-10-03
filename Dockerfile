@@ -2,7 +2,6 @@
 FROM alpine:latest
 
 LABEL maintainer="jeroen.keizer@outlook.com"
-ENV BACKUPDIR="/backups"
 
 # Install dependencies
 RUN apk add --no-cache \
@@ -31,4 +30,4 @@ ENTRYPOINT ["/docker-entrypoint.sh"]
 RUN mkdir -p /etc/autodbbackup.d/
 
 # Create backup directory
-RUN mkdir -p $BACKUPDIR
+RUN mkdir -p "/backup"
