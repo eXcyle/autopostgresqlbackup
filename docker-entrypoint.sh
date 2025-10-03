@@ -64,10 +64,8 @@ CONFIG_PATH="/etc/autodbbackup.d/autopostgresqlbackup.conf"
 
 # Define default values for selected keys
 declare -A DEFAULTS=(
-  [MAILADDR]=""
-  [DBENGINE]="postgresql"
-  [SU_USERNAME]=""
   [BACKUPDIR]="/backup"
+  [DBENGINE]="postgresql"
   [DBNAMES]="all"
   [CREATE_DATABASE]="yes"
   [DOWEEKLY]=7
@@ -77,6 +75,8 @@ declare -A DEFAULTS=(
   [BRMONTHLY]=12
   [COMP]="gzip"
   [PERM]=600
+  [SU_USERNAME]=""
+  [MAILADDR]=""
 )
 
 # Define blacklist (uppercase for consistency)
