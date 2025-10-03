@@ -58,34 +58,69 @@ if [ ! -z "${TZ}" ]; then
 fi
 
 # Generate configfile by using PG_ docker variables
+#!/bin/bash
+set -e
+
 CONFIG_PATH="/etc/autodbbackup.d/autopostgresqlbackup.conf"
-BLACKLIST=("MAILADDR" "DBENGINE" "SU_USERNAME" "BACKUPDIR" "PGDUMP" "PGDUMPALL" "PGDUMP_OPTS" "PGDUMPALL_OPTS" "MY" "MYDUMP" "MYDUMP_OPTS" "PREBACKUP" "POSTBACKUP")
 
+# Define default values for selected keys
+declare -A DEFAULTS=(
+  [MAILADDR]=""
+  [DBENGINE]="postgresql"
+  [SU_USERNAME]=""
+  [BACKUPDIR]="/backup"
+  [DBNAMES]="all"
+  [CREATE_DATABASE]="yes"
+  [DOWEEKLY]=7
+  [DOMONTHLY]=1
+  [BRDAILY]=14
+  [BRWEEKLY]=5
+  [BRMONTHLY]=12
+  [COMP]="gzip"
+  [PERM]=600
+)
+
+# Define blacklist (uppercase for consistency)
+declare -A BLACKLIST=(
+  [MAILADDR]=1
+  [DBENGINE]=1
+  [SU_USERNAME]=1
+  [BACKUPDIR]=1
+  [PGDUMP]=1
+  [PGDUMPALL]=1
+  [PGDUMP_OPTS]=1
+  [PGDUMPALL_OPTS]=1
+  [MY]=1
+  [MYDUMP]=1
+  [MYDUMP_OPTS]=1
+  [PREBACKUP]=1
+  [POSTBACKUP]=1
+)
+
+# Ensure config directory exists
+mkdir -p "$(dirname "$CONFIG_PATH")"
 > "$CONFIG_PATH"
-echo "MAILADDR=\"\"" >> "$CONFIG_PATH"
-echo "DBENGINE=\"postgresql\"" >> "$CONFIG_PATH"
-echo "SU_USERNAME=\"\"" >> "$CONFIG_PATH"
-echo "BACKUPDIR=\"/backup\"" >> "$CONFIG_PATH"
 
-# Loop through all PG_* environment variables
-env -0 | grep '^PG_' | while IFS='=' read -r key value; do
-    stripped_key="${key#PG_}"
-    upper_key="${stripped_key^^}"
-
-    # Check if stripped key is in blacklist
-    skip=false
-    for blocked in "${BLACKLIST[@]}"; do
-        if [[ "${upper_key}" == "${blocked^^}" ]]; then
-            skip=true
-            break
-        fi
-    done
-
-    # Write to config if not blacklisted
-    if ! $skip; then
-        echo "${upper_key}=\"${value}\"" >> "$CONFIG_PATH"
-    fi
+# Write default values with PG_ override support
+for key in "${!DEFAULTS[@]}"; do
+  env_key="PG_${key}"
+  value="${!env_key:-${DEFAULTS[$key]}}"
+  echo "${key}=\"${value}\"" >> "$CONFIG_PATH"
 done
+
+# Write additional PG_ variables not in defaults or blacklist
+env | grep '^PG_' | while IFS='=' read -r raw_key value; do
+  stripped="${raw_key#PG_}"
+  upper="${stripped^^}"
+
+  # Skip if already handled or blacklisted
+  if [[ -n "${DEFAULTS[$upper]}" || -n "${BLACKLIST[$upper]}" ]]; then
+    continue
+  fi
+
+  echo "${upper}=\"${value}\"" >> "$CONFIG_PATH"
+done
+
 echo "Config written to $CONFIG_PATH"
 
 # set /etc/environment for cron
