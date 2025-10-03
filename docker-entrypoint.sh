@@ -70,11 +70,12 @@ echo "BACKUPDIR=\"/backup\""
 # Loop through all PG_* environment variables
 env -o | grep '^PG_' | while IFS='=' read -r key value; do
     stripped_key="${key#PG_}"
+    upper_key="${stripped_key^^}"
 
     # Check if stripped key is in blacklist
     skip=false
     for blocked in "${BLACKLIST[@]}"; do
-        if [[ "${stripped_key,,}" == "${blocked,,}" ]]; then
+        if [[ "${upper_key}" == "${blocked^^}" ]]; then
             skip=true
             break
         fi
@@ -82,7 +83,7 @@ env -o | grep '^PG_' | while IFS='=' read -r key value; do
 
     # Write to config if not blacklisted
     if ! $skip; then
-        echo "${stripped_key}=\"${value}\"" >> "$CONFIG_PATH"
+        echo "${upper_key}=\"${value}\"" >> "$CONFIG_PATH"
     fi
 done
 echo "Config written to $CONFIG_PATH"
