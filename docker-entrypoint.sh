@@ -57,6 +57,18 @@ if [ ! -z "${TZ}" ]; then
     echo "${TZ}" > /etc/timezone
 fi
 
+# Generate configfile by using PG_ docker variables
+CONFIG_PATH="/etc/autodbbackup.d/autopostgresqlbackup.conf"
+> "$CONFIG_PATH"
+
+# Loop through all PG_* environment variables
+env | grep '^PG_' | while IFS='=' read -r key value; do
+    stripped_key="${key#PG_}"
+    echo "${stripped_key}=${value}" >> "$CONFIG_PATH"
+done
+
+echo "Config written to $CONFIG_PATH"
+
 # set /etc/environment for cron
 printenv > /etc/environment
 
