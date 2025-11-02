@@ -2,8 +2,6 @@
 # Stage 1: Builder
 FROM debian:trixie-slim AS builder
 
-LABEL maintainer="jeroen.keizer@outlook.com"
-
 # Install curl, gnupg, and CA certs first
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
@@ -18,6 +16,13 @@ RUN git clone https://github.com/k0lter/autopostgresqlbackup.git /opt/autopostgr
 # ---------------------------------------------------------
 # Stage 2: Final runtime image
 FROM debian:trixie-slim
+
+LABEL org.opencontainers.image.title="autopostgresqlbackup"
+LABEL org.opencontainers.image.description="Docker container containing the AutoPostgreSQLBackup by k0lter (https://github.com/k0lter)"
+LABEL org.opencontainers.image.url="https://github.com/JeroenKeizerNL/autopostgresqlbackup"
+LABEL org.opencontainers.image.source="https://github.com/JeroenKeizerNL/autopostgresqlbackup"
+LABEL org.opencontainers.image.documentation="https://github.com/JeroenKeizerNL/autopostgresqlbackup#readme"
+LABEL org.opencontainers.image.authors="https://github.com/JeroenKeizerNL"
 
 # Install dependencies
 # Include MySQL client for MariaDB/MySQL backup support via autopostgresqlbackup
@@ -45,5 +50,5 @@ COPY --from=builder /opt/autopostgresqlbackup/autopostgresqlbackup /opt/autopost
 COPY --chmod=755 docker-entrypoint.sh /docker-entrypoint.sh
 ENTRYPOINT ["/docker-entrypoint.sh"]
 
-HEALTHCHECK --interval=60s --timeout=10s --start-period=10s --retries=3 \
+HEALTHCHECK --interval=60s --timeout=10s --start-period=5s --retries=3 \
   CMD pidof cron || (echo "cron not running" && exit 1)
