@@ -9,7 +9,7 @@ GITHUB_USERNAME=jeroenkeizernl
 
 
 
-.PHONY: test clean publish _build shell
+.PHONY: pull test clean publish _build unittest shell
 
 pull:
 	@echo "📥 Pulling latest source..."
@@ -44,8 +44,8 @@ publish:
 
 clean:
 	@echo "🧹 Removing container and image..."
-	docker rm -f $(IMAGE_NAME) pgtest mysqltest || echo "Containers not found or already removed."
-	docker rmi -f \
+	-docker rm -f $(IMAGE_NAME) pgtest mysqltest || echo "Containers not found or already removed."
+	-docker rmi -f \
 		$(DOCKER_USERNAME)/$(IMAGE_NAME):latest \
 		$(DOCKER_REGISTRY)/$(DOCKER_USERNAME)/$(IMAGE_NAME):latest \
 		$(GITHUB_USERNAME)/$(IMAGE_NAME):latest \
@@ -76,7 +76,7 @@ unittest: pull clean _build
 	mkdir -p BackupTest/MySQLBackup
 	mkdir -p BackupTest/PostgresqlBackup
 
-	docker network create autopg-net
+	docker network inspect autopg-net >/dev/null 2>&1 || docker network create autopg-net
 
 	# Start PostgreSQL
 	docker run -d --name pgtest \
@@ -145,18 +145,22 @@ unittest: pull clean _build
 
 	# Extract and verify PostgreSQL backup
 	@echo "🔍 Verifying PostgreSQL backup..."
-	@gunzip -c BackupTest/PostgresqlBackup/daily/testdb/*.gz > $$PWD/BackupTest/pgtest.sql
+	@gunzip -c $$PWD/BackupTest/PostgresqlBackup/daily/testdb/*.gz > $$PWD/BackupTest/pgtest.sql
 	@grep -q "CREATE DATABASE testdb" $$PWD/BackupTest/pgtest.sql && grep -q "COPY public.testdata (id, name) FROM stdin;" $$PWD/BackupTest/pgtest.sql || { echo "❌ PostgreSQL backup invalid."; exit 1; }
 
 	# Extract and verify MySQL backup
 	@echo "🔍 Verifying MySQL backup..."
-	@gunzip -c BackupTest/MySQLBackup/daily/testdb/*.gz > $$PWD/BackupTest/mysqltest.sql
+	@gunzip -c $$PWD/BackupTest/MySQLBackup/daily/testdb/*.gz > $$PWD/BackupTest/mysqltest.sql
 	@grep -q "CREATE TABLE \`TestData\`" $$PWD/BackupTest/mysqltest.sql && grep -q "INSERT INTO \`TestData\` VALUES" $$PWD/BackupTest/mysqltest.sql || { echo "❌ MySQL backup invalid."; exit 1; }
 
 	# Cleanup containers
-	docker rm -f pgtest mysqltest
+	-docker rm -f $(IMAGE_NAME) pgtest mysqltest || echo "Containers not found or already removed."
+	-docker rmi -f postgres:15 mariadb:11
 
 	# Cleanup backup folder
 	rm -rf BackupTest
+
+	# Cleanup Network
+	docker network rm autopg-net || echo "Network not found or already removed."
 
 
