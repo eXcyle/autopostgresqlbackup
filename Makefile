@@ -63,6 +63,9 @@ clean:
 	# Cleanup network
 	docker network rm autopg-net || echo "Network not found or already removed."
 
+	# Cleanup volumes
+	docker volume prune -f
+
 shell:
 	@echo "🧑‍💻 Opening shell in container..."
 	docker exec -it $(IMAGE_NAME) /bin/bash
